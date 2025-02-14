@@ -5,7 +5,7 @@ provider "google" {
 }
 
 resource "google_compute_instance" "test1" {
-  name="harness"
+  name="sivasai"
   machine_type="e2-micro"
   boot_disk{
      initialize_params {
