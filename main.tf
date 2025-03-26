@@ -12,7 +12,7 @@ provider "google" {
 }
 
 resource "google_compute_instance" "test1" {
-  name         = "naruto"
+  name         = "naruto12"
   machine_type = "e2-micro"
 
   boot_disk {
