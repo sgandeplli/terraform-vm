@@ -1,9 +1,4 @@
-terraform {
-  backend "gcs" {
-    bucket  = "sekhar1913"  # Replace with your GCS bucket name
-    prefix  = "terraform/state"         # Folder inside the bucket
-  }
-}
+
 
 provider "google" {
   project = "sekhar-452813"
