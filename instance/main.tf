@@ -1,14 +1,13 @@
-
 provider "google" {
   project = "sekhar-452813"
   region  = "us-east1"
-  zone= "us-east1-b"
+  zone    = "us-east1-b"
 }
 
 resource "google_compute_instance" "delegate_vm" {
-  name         = "harness-delegate-vm"
+  name         = "harness-docker-delegate-vm"
   machine_type = "e2-medium"
-  zone         = "us-central1-a"
+  zone         = "us-east1-b"
 
   boot_disk {
     initialize_params {
@@ -18,28 +17,32 @@ resource "google_compute_instance" "delegate_vm" {
 
   network_interface {
     network       = "default"
-    access_config {} # Adds external IP
+    access_config {}
   }
 
-metadata_startup_script = <<-EOT
-  #!/bin/bash
-  exec > /tmp/delegate_install.log 2>&1
-  echo "Updating system..."
-  apt-get update -y
-  apt-get install curl unzip -y
+  metadata_startup_script = <<-EOT
+    #!/bin/bash
+    echo "Updating system..."
+    apt-get update -y
 
-  echo "Downloading Harness Delegate..."
-  curl -L "https://app.harness.io/delegate/download?accountIdentifier=ucHySz2jQKKWQweZdXyCog&orgIdentifier=default&projectIdentifier=default_project&token=NTRhYTY0Mjg3NThkNjBiNjMzNzhjOGQyNjEwOTQyZjY=" -o /root/harness-delegate.tar.gz
+    echo "Installing Docker..."
+    apt-get install -y docker.io
 
-  echo "Extracting and starting delegate..."
-  cd /root
-  tar -zxvf harness-delegate.tar.gz
-  DELEGATE_DIR=$(tar -tf harness-delegate.tar.gz | head -1 | cut -f1 -d"/")
-  cd "$DELEGATE_DIR"
-  nohup ./start.sh > /tmp/delegate.log 2>&1 &
-EOT
+    echo "Enabling Docker service..."
+    systemctl enable docker
+    systemctl start docker
 
+    echo "Running Harness Docker Delegate..."
+    docker run --cpus=1 --memory=2g \
+      -e DELEGATE_NAME=docker-delegate \
+      -e NEXT_GEN="true" \
+      -e DELEGATE_TYPE="DOCKER" \
+      -e ACCOUNT_ID=ucHySz2jQKKWQweZdXyCog \
+      -e DELEGATE_TOKEN=NTRhYTY0Mjg3NThkNjBiNjMzNzhjOGQyNjEwOTQyZjY= \
+      -e DELEGATE_TAGS="" \
+      -e MANAGER_HOST_AND_PORT=https://app.harness.io \
+      us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:25.03.85504 > /tmp/delegate.log 2>&1 &
+  EOT
 
-
-  tags = ["harness-delegate"]
+  tags = ["harness-docker-delegate"]
 }
