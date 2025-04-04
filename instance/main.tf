@@ -20,16 +20,26 @@ resource "google_compute_instance" "delegate_vm" {
     network       = "default"
     access_config {} # Adds external IP
   }
+metadata_startup_script = <<-EOT
+  #!/bin/bash
+  exec > /tmp/delegate_install.log 2>&1
+  echo "Starting Harness Delegate Installation..."
 
-  metadata_startup_script = <<-EOT
-    #!/bin/bash
-    apt-get update
-    apt-get install curl unzip -y
-    curl -L "https://app.harness.io/delegate/download?accountIdentifier=ucHySz2jQKKWQweZdXyCog&orgIdentifier=default&projectIdentifier=default_project&token=NTRhYTY0Mjg3NThkNjBiNjMzNzhjOGQyNjEwOTQyZjY=" -o harness-delegate.tar.gz
-    tar -zxvf harness-delegate.tar.gz
-    cd harness-delegate
-    nohup ./start.sh > /tmp/delegate.log 2>&1 &
-  EOT
+  apt-get update -y
+  apt-get install curl unzip -y
+
+  echo "Downloading Harness Delegate..."
+  curl -L "https://app.harness.io/delegate/download?accountIdentifier=ucHySz2jQKKWQweZdXyCog&orgIdentifier=default&projectIdentifier=default_project&token=NTRhYTY0Mjg3NThkNjBiNjMzNzhjOGQyNjEwOTQyZjY=" -o /root/harness-delegate.tar.gz
+
+  echo "Extracting..."
+  tar -zxvf /root/harness-delegate.tar.gz -C /root
+
+  echo "Starting delegate..."
+  cd /root/harness-delegate
+  nohup ./start.sh > /tmp/delegate.log 2>&1 &
+  echo "Delegate start script executed."
+EOT
+
 
   tags = ["harness-delegate"]
 }
