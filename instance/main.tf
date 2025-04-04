@@ -33,15 +33,14 @@ resource "google_compute_instance" "delegate_vm" {
     systemctl start docker
 
     echo "Running Harness Docker Delegate..."
-    docker run --cpus=1 --memory=2g \
-      -e DELEGATE_NAME=docker-delegate \
-      -e NEXT_GEN="true" \
-      -e DELEGATE_TYPE="DOCKER" \
-      -e ACCOUNT_ID=ucHySz2jQKKWQweZdXyCog \
-      -e DELEGATE_TOKEN=NTRhYTY0Mjg3NThkNjBiNjMzNzhjOGQyNjEwOTQyZjY= \
-      -e DELEGATE_TAGS="" \
-      -e MANAGER_HOST_AND_PORT=https://app.harness.io \
-      us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:25.03.85504 > /tmp/delegate.log 2>&1 &
+    docker run  --cpus=1 --memory=2g \
+  -e DELEGATE_NAME=docker-delegate \
+  -e NEXT_GEN="true" \
+  -e DELEGATE_TYPE="DOCKER" \
+  -e ACCOUNT_ID=ucHySz2jQKKWQweZdXyCog \
+  -e DELEGATE_TOKEN=NTRhYTY0Mjg3NThkNjBiNjMzNzhjOGQyNjEwOTQyZjY= \
+  -e DELEGATE_TAGS="delegate-tag" \
+  -e MANAGER_HOST_AND_PORT=https://app.harness.io us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:25.03.85504
   EOT
 
   tags = ["harness-docker-delegate"]
