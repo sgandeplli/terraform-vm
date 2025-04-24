@@ -1,7 +1,7 @@
 
 
 provider "google" {
-  project = "sekhar-452813"
+  project = "symbolic-pipe-457709-n9"
   region  = "us-east1"
   zone= "us-east1-b"
 }
