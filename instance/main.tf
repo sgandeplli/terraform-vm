@@ -8,6 +8,7 @@ resource "google_compute_instance" "delegate_vm" {
   name         = "harness-docker-delegate-vm"
   machine_type = "e2-medium"
   zone         = "us-east1-b"
+  allow_stopping_for_update = true
 
   boot_disk {
     initialize_params {
